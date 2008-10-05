@@ -31,7 +31,8 @@ using OpenEngine::Renderers::RenderingEventArg;
 using OpenEngine::Resources::ITextureResourcePtr;
 
 HUD::HUD() {
-
+    width = 800;
+    height = 600;
 }
 
 HUD::~HUD() {
@@ -49,7 +50,7 @@ HUD::~HUD() {
 void HUD::Handle(RenderingEventArg arg) {
     // @todo: listen for frame changes so our HUD is correct
     ViewingVolume* vv = new ViewingVolume();
-    Orthotope* ot = new Orthotope(*vv, -1, 1, 0, 800, 600, 0);
+    Orthotope* ot = new Orthotope(*vv, -1, 1, 0, width, height, 0);
     arg.renderer.ApplyViewingVolume(*ot);
     delete ot;
     delete vv;
@@ -59,6 +60,14 @@ void HUD::Handle(RenderingEventArg arg) {
     // @todo: Do this in a general way (read: not gl specific)
     bool depth = glIsEnabled(GL_DEPTH_TEST);
     if (depth) glDisable(GL_DEPTH_TEST);
+
+    GLboolean blending = glIsEnabled(GL_BLEND);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    GLboolean lighting = glIsEnabled(GL_LIGHTING);
+    glDisable(GL_LIGHTING);
+    
 
     Vector<3,float> v1,v2,v3,v4,n;
     Vector<2,float> t1,t2,t3,t4;
@@ -96,6 +105,8 @@ void HUD::Handle(RenderingEventArg arg) {
     }
 
     if (depth) glEnable(GL_DEPTH_TEST);
+    if (!blending) glDisable(GL_BLEND); //@todo: apply original blend function
+    if (lighting) glEnable(GL_LIGHTING);
 }
 
 /**
@@ -155,6 +166,25 @@ void HUD::Surface::SetPosition(const unsigned int x,
                                const unsigned int y) {
     this->x = x;
     this->y = y;
+}
+
+/**
+ * Set the position of the surface on screen.
+ */
+void HUD::Surface::SetPosition(const HorisontalAlignment ha,
+                               const VerticalAlignment va) {
+    switch(ha) {
+    case LEFT: x = 0; break;
+    case RIGHT: x = hud.width - texr->GetWidth(); break;
+    case MIDDLE: x = (hud.width - texr->GetWidth()) / 2; break;
+    }
+    
+    switch(va) {
+    case TOP: y = 0; break;
+    case BOTTOM: y = hud.height - texr->GetHeight(); break;
+    case CENTER: y = (hud.height - texr->GetHeight()) / 2; break;
+    }
+    logger.info << "Position on HUD:" << x << ", " << y << logger.end;
 }
 
 /**

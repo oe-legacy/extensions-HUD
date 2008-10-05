@@ -37,10 +37,15 @@ public:
      */
     class Surface {
     public:
+        enum HorisontalAlignment { RIGHT, LEFT, MIDDLE };
+        enum VerticalAlignment { TOP, BOTTOM, CENTER };
+
         virtual ~Surface();
         void MoveToFront();
         void MoveToBack();
         void SetPosition(const unsigned int x, const unsigned int y);
+        void SetPosition(const HorisontalAlignment ha,
+                         const VerticalAlignment va);
         void SetPosition(const Math::Vector<2,int> xy);
         Math::Vector<2,int> GetPosition() const;
     protected:
@@ -64,7 +69,7 @@ public:
 
 protected:
     std::list<Surface*> surfaces;
-
+    unsigned int width, height;
 };
 
 } // NS Display
