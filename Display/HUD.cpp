@@ -12,7 +12,6 @@
 #include <Display/HUD.h>
 #include <Math/Vector.h>
 #include <Geometry/Face.h>
-#include <Logging/Logger.h>
 
 #include <Display/Orthotope.h>
 #include <Display/ViewingVolume.h>
@@ -24,7 +23,6 @@ using std::list;
 using OpenEngine::Math::Vector;
 using OpenEngine::Geometry::Face;
 using OpenEngine::Geometry::FacePtr;
-using OpenEngine::Logging::Logger;
 using OpenEngine::Display::Orthotope;
 using OpenEngine::Display::ViewingVolume;
 using OpenEngine::Renderers::RenderingEventArg;
@@ -184,7 +182,6 @@ void HUD::Surface::SetPosition(const HorisontalAlignment ha,
     case BOTTOM: y = hud.height - texr->GetHeight(); break;
     case CENTER: y = (hud.height - texr->GetHeight()) / 2; break;
     }
-    logger.info << "Position on HUD:" << x << ", " << y << logger.end;
 }
 
 /**
