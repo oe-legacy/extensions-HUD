@@ -13,8 +13,7 @@
 #include <Math/Vector.h>
 #include <Geometry/Face.h>
 
-#include <Display/Orthotope.h>
-#include <Display/ViewingVolume.h>
+#include <Display/OrthogonalViewingVolume.h>
 
 namespace OpenEngine {
 namespace Display {
@@ -23,8 +22,7 @@ using std::list;
 using OpenEngine::Math::Vector;
 using OpenEngine::Geometry::Face;
 using OpenEngine::Geometry::FacePtr;
-using OpenEngine::Display::Orthotope;
-using OpenEngine::Display::ViewingVolume;
+using OpenEngine::Display::OrthogonalViewingVolume;
 using OpenEngine::Renderers::RenderingEventArg;
 using OpenEngine::Resources::ITextureResourcePtr;
 
@@ -47,11 +45,9 @@ HUD::~HUD() {
  */
 void HUD::Handle(RenderingEventArg arg) {
     // @todo: listen for frame changes so our HUD is correct
-    ViewingVolume* vv = new ViewingVolume();
-    Orthotope* ot = new Orthotope(*vv, -1, 1, 0, width, height, 0);
+    OrthogonalViewingVolume* ot = new OrthogonalViewingVolume(-1, 1, 0, width, height, 0);
     arg.renderer.ApplyViewingVolume(*ot);
     delete ot;
-    delete vv;
 
     // We need to disabled the depth test otherwise we will not draw
     // things in the correct order.
