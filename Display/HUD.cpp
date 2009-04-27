@@ -45,7 +45,7 @@ HUD::~HUD() {
  */
 void HUD::Handle(RenderingEventArg arg) {
     // @todo: listen for frame changes so our HUD is correct
-    OrthogonalViewingVolume* ot = new OrthogonalViewingVolume(-1, 1, 0, width, height, 0);
+    OrthogonalViewingVolume* ot = new OrthogonalViewingVolume(-1, 1, 0, width, 0, height);
     arg.renderer.ApplyViewingVolume(*ot);
     delete ot;
 
