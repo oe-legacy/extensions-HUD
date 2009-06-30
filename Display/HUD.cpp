@@ -31,6 +31,10 @@ HUD::HUD() {
     height = 600;
 }
 
+HUD::HUD(unsigned int width, unsigned int height)
+        : width(width), height(height) {
+}
+
 HUD::~HUD() {
     list<Surface*>::iterator itr;
     for (itr=surfaces.begin(); itr != surfaces.end(); itr++)
@@ -56,13 +60,18 @@ void HUD::Handle(RenderingEventArg arg) {
     if (depth) glDisable(GL_DEPTH_TEST);
 
     GLboolean blending = glIsEnabled(GL_BLEND);
+    GLenum source, destination, equation;
+    glGetIntegerv(GL_BLEND_SRC, (GLint*) &source);
+    glGetIntegerv(GL_BLEND_DST, (GLint*) &destination);
+    glGetIntegerv(GL_BLEND_EQUATION, (GLint*) &equation);
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendEquationEXT(GL_FUNC_ADD);
 
     GLboolean lighting = glIsEnabled(GL_LIGHTING);
     glDisable(GL_LIGHTING);
     
-
     Vector<3,float> v1,v2,v3,v4,n;
     Vector<2,float> t1,t2,t3,t4;
     unsigned int x, y, w, h;
@@ -75,8 +84,8 @@ void HUD::Handle(RenderingEventArg arg) {
 
         x = (*itr)->x;
         y = (*itr)->y;
-        w = (*itr)->texr->GetWidth();
-        h = (*itr)->texr->GetHeight();
+        w = (*itr)->texr->GetWidth() * (*itr)->scaleX;
+        h = (*itr)->texr->GetHeight() * (*itr)->scaleY;
         if (w*h == 0) continue;
 
         n  = Vector<3,float>(0,0,1);
@@ -99,9 +108,13 @@ void HUD::Handle(RenderingEventArg arg) {
         arg.renderer.DrawFace(f);
     }
 
+    glBlendFunc(source, destination);
+    glBlendEquationEXT(equation);
+
+    if (!blending) glDisable(GL_BLEND);
     if (depth) glEnable(GL_DEPTH_TEST);
-    if (!blending) glDisable(GL_BLEND); //@todo: apply original blend function
     if (lighting) glEnable(GL_LIGHTING);
+    CHECK_FOR_GL_ERROR();
 }
 
 /**
@@ -110,22 +123,21 @@ void HUD::Handle(RenderingEventArg arg) {
  */
 HUD::Surface* HUD::CreateSurface(ITextureResourcePtr texr,
                                  const unsigned int x,
-                                 const unsigned int y) {
-    Surface* w = new Surface(*this, texr, x, y);
+                                 const unsigned int y,
+                                 const float scaleX,
+                                 const float scaleY) {
+    Surface* w = new Surface(*this, texr, x, y, scaleX, scaleY);
     surfaces.push_back(w);
     // save the iterator
     w->itr = --surfaces.end();
     return w;
 }
 
-HUD::Surface::Surface(HUD& hud,
-                      ITextureResourcePtr texr,
-                      unsigned int x,
-                      unsigned int y)
-    : hud(hud)
-    , texr(texr)
-    , x(x)
-    , y(y) {
+HUD::Surface::Surface(HUD& hud, ITextureResourcePtr texr,
+                      unsigned int x, unsigned int y,
+                      float scaleX, float scaleY)
+    : hud(hud), texr(texr), x(x), y(y)
+    , scaleX(scaleX), scaleY(scaleY) {
     
 }
 
@@ -166,6 +178,14 @@ void HUD::Surface::SetPosition(const unsigned int x,
 /**
  * Set the position of the surface on screen.
  */
+void HUD::Surface::SetPosition(const Vector<2,int> xy) {
+    x = xy.Get(0);
+    y = xy.Get(1);
+}
+
+/**
+ * Set the position of the surface on screen.
+ */
 void HUD::Surface::SetPosition(const HorisontalAlignment ha,
                                const VerticalAlignment va) {
     switch(ha) {
@@ -182,18 +202,48 @@ void HUD::Surface::SetPosition(const HorisontalAlignment ha,
 }
 
 /**
- * Set the position of the surface on screen.
- */
-void HUD::Surface::SetPosition(const Vector<2,int> xy) {
-    x = xy.Get(0);
-    y = xy.Get(1);
-}
-
-/**
  * Get the position of the surface on screen.
  */
 Vector<2,int> HUD::Surface::GetPosition() const {
     return Vector<2,int>(x,y);
+}
+
+/**
+ * Set the scaling factors of the surface on screen.
+ */
+void HUD::Surface::SetScale(const float scaleX,
+                            const float scaleY) {
+    this->scaleX = scaleX;
+    this->scaleY = scaleY;
+}
+
+/**
+ * Set the scaling factors of the surface on screen.
+ */
+void HUD::Surface::SetScale(const Vector<2,float> scaleXY) {
+    scaleX = scaleXY.Get(0);
+    scaleY = scaleXY.Get(1);
+}
+
+/**
+ * Set the scaling factors of the surface on screen.
+ */
+void HUD::Surface::SetScale(const Scaling scale) {
+    switch(scale) {
+    case ORIGINAL:
+        scaleX = scaleY = 1.0; break;
+    case FULLSCREEN:
+        scaleX = (float)hud.width / (float)texr->GetWidth();
+        scaleY = (float)hud.height / (float)texr->GetHeight();
+        break;
+    }
+}
+
+/**
+ * Get the scaling factors of the surface on screen.
+ */
+Vector<2,float> HUD::Surface::GetScale() const {
+    return Vector<2,float>(scaleX,scaleY);
 }
 
 } // NS Display

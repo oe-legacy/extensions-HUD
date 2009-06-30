@@ -39,33 +39,42 @@ public:
     public:
         enum HorisontalAlignment { RIGHT, LEFT, MIDDLE };
         enum VerticalAlignment { TOP, BOTTOM, CENTER };
+        enum Scaling { ORIGINAL, FULLSCREEN };
 
         virtual ~Surface();
         void MoveToFront();
         void MoveToBack();
         void SetPosition(const unsigned int x, const unsigned int y);
+        void SetPosition(const Math::Vector<2,int> xy);
         void SetPosition(const HorisontalAlignment ha,
                          const VerticalAlignment va);
-        void SetPosition(const Math::Vector<2,int> xy);
         Math::Vector<2,int> GetPosition() const;
+
+        void SetScale(const float scaleX, const float scaleY);
+        void SetScale(const Math::Vector<2,float> scaleXY);
+        void SetScale(const Scaling scale);
+        Math::Vector<2,float> GetScale() const;
     protected:
         friend class HUD;
         HUD& hud;
         std::list<Surface*>::iterator itr;
         Resources::ITextureResourcePtr texr;
         unsigned int x, y;
-        Surface(HUD&,
-                Resources::ITextureResourcePtr,
-                unsigned int x,
-                unsigned int y);
+        float scaleX, scaleY;
+        Surface(HUD&, Resources::ITextureResourcePtr,
+                unsigned int x, unsigned int y,
+                float scaleX, float scaleY);
     };
 
     HUD();
+    HUD(unsigned int width, unsigned int height);
     virtual ~HUD();
     virtual void Handle(Renderers::RenderingEventArg arg);
     virtual Surface* CreateSurface(Resources::ITextureResourcePtr texr,
                                    const unsigned int x=0,
-                                   const unsigned int y=0);
+                                   const unsigned int y=0,
+                                   const float scaleX = 1.0,
+                                   const float scaleY = 1.0);
 
 protected:
     std::list<Surface*> surfaces;
