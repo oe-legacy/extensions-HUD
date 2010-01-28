@@ -12,9 +12,16 @@
 
 #include <Core/IListener.h>
 #include <Renderers/IRenderer.h>
-#include <Resources/ITextureResource.h>
 #include <Math/Vector.h>
 #include <list>
+
+//forward declartion
+namespace OpenEngine {
+    namespace Resources {
+        class ITextureResource;
+        typedef boost::shared_ptr<ITextureResource> ITextureResourcePtr;
+    }
+}
 
 namespace OpenEngine {
 namespace Display {

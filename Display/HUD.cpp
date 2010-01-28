@@ -9,6 +9,7 @@
 
 #include <Meta/OpenGL.h> // @todo: remove this, please
 
+#include <Resources/ITextureResource.h>
 #include <Display/HUD.h>
 #include <Math/Vector.h>
 #include <Geometry/Face.h>
