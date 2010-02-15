@@ -18,8 +18,8 @@
 //forward declartion
 namespace OpenEngine {
     namespace Resources {
-        class ITextureResource;
-        typedef boost::shared_ptr<ITextureResource> ITextureResourcePtr;
+        class ITexture2D;
+        typedef boost::shared_ptr<ITexture2D> ITexture2DPtr;
     }
 }
 
@@ -65,10 +65,10 @@ public:
         friend class HUD;
         HUD& hud;
         std::list<Surface*>::iterator itr;
-        Resources::ITextureResourcePtr texr;
+        Resources::ITexture2DPtr texr;
         unsigned int x, y;
         float scaleX, scaleY;
-        Surface(HUD&, Resources::ITextureResourcePtr,
+        Surface(HUD&, Resources::ITexture2DPtr,
                 unsigned int x, unsigned int y,
                 float scaleX, float scaleY);
     };
@@ -77,7 +77,7 @@ public:
     HUD(unsigned int width, unsigned int height);
     virtual ~HUD();
     virtual void Handle(Renderers::RenderingEventArg arg);
-    virtual Surface* CreateSurface(Resources::ITextureResourcePtr texr,
+    virtual Surface* CreateSurface(Resources::ITexture2DPtr texr,
                                    const unsigned int x=0,
                                    const unsigned int y=0,
                                    const float scaleX = 1.0,

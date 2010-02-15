@@ -9,7 +9,7 @@
 
 #include <Meta/OpenGL.h> // @todo: remove this, please
 
-#include <Resources/ITextureResource.h>
+#include <Resources/ITexture2D.h>
 #include <Display/HUD.h>
 #include <Math/Vector.h>
 #include <Geometry/Face.h>
@@ -25,7 +25,7 @@ using OpenEngine::Geometry::Face;
 using OpenEngine::Geometry::FacePtr;
 using OpenEngine::Display::OrthogonalViewingVolume;
 using OpenEngine::Renderers::RenderingEventArg;
-using OpenEngine::Resources::ITextureResourcePtr;
+using OpenEngine::Resources::ITexture2DPtr;
 
 HUD::HUD() {
     width = 800;
@@ -122,7 +122,7 @@ void HUD::Handle(RenderingEventArg arg) {
  * Create a new surface from a texture.
  * To remove the surface from the HUD, simply delete it.
  */
-HUD::Surface* HUD::CreateSurface(ITextureResourcePtr texr,
+HUD::Surface* HUD::CreateSurface(ITexture2DPtr texr,
                                  const unsigned int x,
                                  const unsigned int y,
                                  const float scaleX,
@@ -134,7 +134,7 @@ HUD::Surface* HUD::CreateSurface(ITextureResourcePtr texr,
     return w;
 }
 
-HUD::Surface::Surface(HUD& hud, ITextureResourcePtr texr,
+HUD::Surface::Surface(HUD& hud, ITexture2DPtr texr,
                       unsigned int x, unsigned int y,
                       float scaleX, float scaleY)
     : hud(hud), texr(texr), x(x), y(y)
