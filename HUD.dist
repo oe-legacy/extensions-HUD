@@ -1,7 +1,9 @@
 # HUD dependencies
 
+darcs /extensions/HUD           http://openengine.dk/code/extensions/HUD
 darcs /extensions/CairoResource http://openengine.dk/code/extensions/CairoResource
 
-darcs-dev /extensions/CairoResource fh.daimi.au.dk:/users/cgd/code/extensions/CairoResource
+darcs-dev /extensions/CairoResource	fh.daimi.au.dk:/users/cgd/code/extensions/CairoResource
+darcs-dev /extensions/HUD		fh.daimi.au.dk:/users/cgd/code/extensions/HUD
 
 
