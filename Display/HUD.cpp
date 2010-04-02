@@ -78,10 +78,8 @@ void HUD::Handle(RenderingEventArg arg) {
     unsigned int x, y, w, h;
     list<Surface*>::iterator itr;
     for (itr=surfaces.begin(); itr != surfaces.end(); itr++) {
-        //(*itr)->texr->Load();
         if ((*itr)->texr->GetID() == 0)
             arg.renderer.LoadTexture((*itr)->texr);
-        //(*itr)->texr->Unload();
 
         x = (*itr)->x;
         y = (*itr)->y;
@@ -100,7 +98,7 @@ void HUD::Handle(RenderingEventArg arg) {
         t3 = Vector<2,float>(1, 0);
 
         FacePtr f = FacePtr(new Face(v1,v2,v3,n,n,n));
-        f->mat->texr = (*itr)->texr;
+        f->mat->AddTexture((*itr)->texr);
         f->vert[0] = v1; f->vert[1] = v2; f->vert[2] = v3;
         f->texc[0] = t1; f->texc[1] = t2; f->texc[2] = t3;
         arg.renderer.DrawFace(f);
