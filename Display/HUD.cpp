@@ -83,8 +83,8 @@ void HUD::Handle(RenderingEventArg arg) {
 
         x = (*itr)->x;
         y = (*itr)->y;
-        w = (*itr)->texr->GetWidth() * (*itr)->scaleX;
-        h = (*itr)->texr->GetHeight() * (*itr)->scaleY;
+        w = (unsigned int)((*itr)->texr->GetWidth() * (*itr)->scaleX);
+        h = (unsigned int)((*itr)->texr->GetHeight() * (*itr)->scaleY);
         if (w*h == 0) continue;
 
         n  = Vector<3,float>(0,0,1);
