@@ -9,6 +9,4 @@ TARGET_LINK_LIBRARIES(Extensions_HUD
   OpenEngine_Resources
   OpenEngine_Renderers
   OpenEngine_Display
-  # extenstions libraries
-  Extensions_CairoResource
 )
