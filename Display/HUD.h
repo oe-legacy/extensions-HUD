@@ -83,9 +83,12 @@ public:
                                    const float scaleX = 1.0,
                                    const float scaleY = 1.0);
 
+    void SetState(bool state);
+    bool GetState();
 protected:
     std::list<Surface*> surfaces;
     unsigned int width, height;
+    bool state;
 };
 
 } // NS Display

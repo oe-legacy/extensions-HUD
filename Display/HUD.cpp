@@ -30,10 +30,11 @@ using OpenEngine::Resources::ITexture2DPtr;
 HUD::HUD() {
     width = 800;
     height = 600;
+    state = true;
 }
 
 HUD::HUD(unsigned int width, unsigned int height)
-        : width(width), height(height) {
+    : width(width), height(height), state(true) {
 }
 
 HUD::~HUD() {
@@ -43,77 +44,87 @@ HUD::~HUD() {
     surfaces.clear();
 }
 
+void HUD::SetState(bool state) {
+    this->state = state;
+}
+
+bool HUD::GetState() {
+    return state;
+}
+
 /**
  * Redraw on a rendering event.
  * Usually you will want to attach this to the post-process event of
  * your renderer. 
  */
 void HUD::Handle(RenderingEventArg arg) {
-    // @todo: listen for frame changes so our HUD is correct
-    OrthogonalViewingVolume* ot = new OrthogonalViewingVolume(-1, 1, 0, width, 0, height);
-    arg.renderer.ApplyViewingVolume(*ot);
-    delete ot;
+    if (state) {
+        // @todo: listen for frame changes so our HUD is correct
+        OrthogonalViewingVolume* ot = new OrthogonalViewingVolume(-1, 1, 0, width, 0, height);
+        arg.renderer.ApplyViewingVolume(*ot);
+        delete ot;
 
-    // We need to disabled the depth test otherwise we will not draw
-    // things in the correct order.
-    // @todo: Do this in a general way (read: not gl specific)
-    bool depth = glIsEnabled(GL_DEPTH_TEST);
-    if (depth) glDisable(GL_DEPTH_TEST);
+        // We need to disabled the depth test otherwise we will not draw
+        // things in the correct order.
+        // @todo: Do this in a general way (read: not gl specific)
+        bool depth = glIsEnabled(GL_DEPTH_TEST);
+        if (depth) glDisable(GL_DEPTH_TEST);
 
-    GLboolean blending = glIsEnabled(GL_BLEND);
-    GLenum source, destination, equation;
-    glGetIntegerv(GL_BLEND_SRC, (GLint*) &source);
-    glGetIntegerv(GL_BLEND_DST, (GLint*) &destination);
-    glGetIntegerv(GL_BLEND_EQUATION, (GLint*) &equation);
+        GLboolean blending = glIsEnabled(GL_BLEND);
+        GLenum source, destination, equation;
+        glGetIntegerv(GL_BLEND_SRC, (GLint*) &source);
+        glGetIntegerv(GL_BLEND_DST, (GLint*) &destination);
+        glGetIntegerv(GL_BLEND_EQUATION, (GLint*) &equation);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBlendEquationEXT(GL_FUNC_ADD);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendEquationEXT(GL_FUNC_ADD);
 
-    GLboolean lighting = glIsEnabled(GL_LIGHTING);
-    glDisable(GL_LIGHTING);
+        GLboolean lighting = glIsEnabled(GL_LIGHTING);
+        glDisable(GL_LIGHTING);
     
-    Vector<3,float> v1,v2,v3,v4,n;
-    Vector<2,float> t1,t2,t3,t4;
-    unsigned int x, y, w, h;
-    list<Surface*>::iterator itr;
-    for (itr=surfaces.begin(); itr != surfaces.end(); itr++) {
-        if ((*itr)->texr->GetID() == 0)
-            arg.renderer.LoadTexture((*itr)->texr);
+        Vector<3,float> v1,v2,v3,v4,n;
+        Vector<2,float> t1,t2,t3,t4;
+        unsigned int x, y, w, h;
+        list<Surface*>::iterator itr;
+        for (itr=surfaces.begin(); itr != surfaces.end(); itr++) {
+            if ((*itr)->texr->GetID() == 0)
+                arg.renderer.LoadTexture((*itr)->texr);
 
-        x = (*itr)->x;
-        y = (*itr)->y;
-        w = (unsigned int)((*itr)->texr->GetWidth() * (*itr)->scaleX);
-        h = (unsigned int)((*itr)->texr->GetHeight() * (*itr)->scaleY);
-        if (w*h == 0) continue;
+            x = (*itr)->x;
+            y = (*itr)->y;
+            w = (unsigned int)((*itr)->texr->GetWidth() * (*itr)->scaleX);
+            h = (unsigned int)((*itr)->texr->GetHeight() * (*itr)->scaleY);
+            if (w*h == 0) continue;
 
-        n  = Vector<3,float>(0,0,1);
-        v1 = Vector<3,float>(x,   y,   0);
-        v2 = Vector<3,float>(x,   y+h, 0);
-        v3 = Vector<3,float>(x+w, y+h, 0);
-        v4 = Vector<3,float>(x+w, y,   0);
-        t2 = Vector<2,float>(0, 0);
-        t1 = Vector<2,float>(0, 1);
-        t4 = Vector<2,float>(1, 1);
-        t3 = Vector<2,float>(1, 0);
+            n  = Vector<3,float>(0,0,1);
+            v1 = Vector<3,float>(x,   y,   0);
+            v2 = Vector<3,float>(x,   y+h, 0);
+            v3 = Vector<3,float>(x+w, y+h, 0);
+            v4 = Vector<3,float>(x+w, y,   0);
+            t2 = Vector<2,float>(0, 0);
+            t1 = Vector<2,float>(0, 1);
+            t4 = Vector<2,float>(1, 1);
+            t3 = Vector<2,float>(1, 0);
 
-        FacePtr f = FacePtr(new Face(v1,v2,v3,n,n,n));
-        f->mat->AddTexture((*itr)->texr);
-        f->vert[0] = v1; f->vert[1] = v2; f->vert[2] = v3;
-        f->texc[0] = t1; f->texc[1] = t2; f->texc[2] = t3;
-        arg.renderer.DrawFace(f);
-        f->vert[0] = v1; f->vert[1] = v3; f->vert[2] = v4;
-        f->texc[0] = t1; f->texc[1] = t3; f->texc[2] = t4;
-        arg.renderer.DrawFace(f);
+            FacePtr f = FacePtr(new Face(v1,v2,v3,n,n,n));
+            f->mat->AddTexture((*itr)->texr);
+            f->vert[0] = v1; f->vert[1] = v2; f->vert[2] = v3;
+            f->texc[0] = t1; f->texc[1] = t2; f->texc[2] = t3;
+            arg.renderer.DrawFace(f);
+            f->vert[0] = v1; f->vert[1] = v3; f->vert[2] = v4;
+            f->texc[0] = t1; f->texc[1] = t3; f->texc[2] = t4;
+            arg.renderer.DrawFace(f);
+        }
+
+        glBlendFunc(source, destination);
+        glBlendEquationEXT(equation);
+
+        if (!blending) glDisable(GL_BLEND);
+        if (depth) glEnable(GL_DEPTH_TEST);
+        if (lighting) glEnable(GL_LIGHTING);
+        CHECK_FOR_GL_ERROR();
     }
-
-    glBlendFunc(source, destination);
-    glBlendEquationEXT(equation);
-
-    if (!blending) glDisable(GL_BLEND);
-    if (depth) glEnable(GL_DEPTH_TEST);
-    if (lighting) glEnable(GL_LIGHTING);
-    CHECK_FOR_GL_ERROR();
 }
 
 /**
