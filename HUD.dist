@@ -1,9 +1,5 @@
+git /extensions/HUD           git://github.com/oe-legacy/extensions-HUD.git
+git-dev /extensions/HUD       git@github.com:oe-legacy/extensions-HUD.git
+
 # HUD dependencies
-
-darcs /extensions/HUD           http://openengine.dk/code/extensions/HUD
-darcs /extensions/CairoResource http://openengine.dk/code/extensions/CairoResource
-
-darcs-dev /extensions/CairoResource	fh.daimi.au.dk:/users/cgd/code/extensions/CairoResource
-darcs-dev /extensions/HUD		fh.daimi.au.dk:/users/cgd/code/extensions/HUD
-
-
+dist /extensions/CairoResource/CairoResource.dist                               https://raw.github.com/oe-legacy/extensions-CairoResource/master/CairoResource.dist
